@@ -9,7 +9,9 @@
 
 In questo capitolo viene presentata prima l'architettura multi-process dei browser, in particolare di Chrome, per la gestione delle pagine web. Uno degli obiettivi è difatti la possibilità di eseguire i componenti nelle finestre figlie come processi separati, in modo da migliorare e non inficiare il processo dell'applicazione principale.
 
-In seguito si illustra invece lo stato dell'arte delle diverse soluzioni per la comunicazione cross-page in JavaScript tra pagine su processi diversi e l'architettura finale utilizzata dalla libreria \textit{Stargate}.
+In seguito si illustra invece lo stato dell'arte delle diverse soluzioni per la comunicazione cross-page in JavaScript tra pagine su tab diverse. \\
+
+Entrambe le sezioni fungono da spiegazione del contesto tecnologico in cui è stata sviluppata la soluzione \textit{Stargate}.
 
 \section{Architettura multi-processi}
 
@@ -60,3 +62,111 @@ Raggruppa tutte le pagine dello stesso sito nello stesso processo, indipendentem
 \subsubsection{Process-per-tab}
 
 Esiste anche una strategie più semplice che dedica un processo renderer per ogni gruppo di tab. Per ovvi motivi è estremamente inefficiente.
+
+\section{Comunicazione cross-page}
+
+Nel corso degli anni vi sono state diverse strategie per la comunicazione cross-page tra pagine web in diversi tab, per soddisfare casi d'uso quali fare il check-out in una nuova pagina protetta di PayPal e notificare la pagina principale del risultato. Un altro esempio d'uso è la possibilità di avere una chat in una pagina separata, che tuttavia scambi informazioni con l'applicazione principale. Ed infine ovviamente il caso d'uso in questione, ovvero estrarre componenti UI per i monitor multipli. \\
+
+\subsection{postMessage}
+
+Il metodo \texttt{window.postMessage(message)} permette la comunicazione sicura attraverso istanze di finestre ed altri tipi di oggetti cross-page, ad esempio tra una pagina ed il popup che ha creato.
+
+\texttt{targetWindow.postMessage(message);}
+
+\begin{itemize}
+    \item \textbf{targetWindow}: riferimento alla finestra che riceverà il messaggio. Alcuni esempi per ottenere tale riferimento sono:
+        \begin{itemize}
+            \item \texttt{window.open()} crea una nuova finestra;
+            \item \texttt{window.opener} restituisce il riferimento alla finestra genitore che ha aperto la finestra corrente tramite il metodo precendete;
+        \end{itemize}
+    \item \textbf{message}: dati da inviare all'altra finestra. I dati sono serializzati usando lo \textit{structured clone algorithm} descritto successivamente, ma implica la possibilità di trasmettere una vasta varietà di oggetti in maniera safe senza doverli serializzare;
+\end{itemize}
+
+La finestra che riceve il messaggio può rimanere in ascolto attraverso la proprietà JavaScript \texttt{self.onmessage} che assegna alla propria pagina una funzione da invocare ogni volta che arriva un messaggio inviato da \textit{postMessage}.
+
+\begin{lstlisting}
+self.onmessage = function(message) {
+    // Do something with message
+}
+\end{lstlisting}
+
+\subsection{Eventi Storage}
+
+Laddove l'API dedicata alla comunicazione cross-page \textit{postMessage} non si possa utilizzare, ad esempio su browsers meno moderni o perché non è possibile ottenere un riferimento alla finestra, è possibile usare gli eventi dello \texttt{Storage}. I browsers forniscono difatti delle API per la lettura e scrittura di dati persistenti anche dopo la chiusura della pagina. Inoltre lo storage è condiviso tra tutte le pagine aventi lo stesso dominio. \\
+
+È quindi dunque possibile usare tali API per comunicare tra le finestre. \\
+
+Esempio di invio di dati:
+
+\begin{lstlisting}
+// Salva nel proprio storage, che e' tuttavia condiviso tra 
+// tab dello stesso dominio
+window.localStorage.setItem('stargate-msg', message)
+\end{lstlisting}
+
+Esempio di ascolto di dati, ove si rimane in ascolto dell'evento di modifica dello Storage:
+
+\begin{lstlisting}
+window.addEventListener('storage', function(event) {
+  const message = window.localStorage.getItem('stargate-msg')
+})
+\end{lstlisting}
+
+È dunque palese che questo metodo sia un trick e non un'API nata allo scopo della comunicazione cross-page, tuttavia è stato utilizzato per anni anche a questo scopo. Un ulteriore aspetto inconveniente di questo approccio è il fatto che sia obbligatorio, a differenza di \textit{postMessage}, serializzare i dati in formato \gls{JSON}. Un confronto tra \textit{structured clone algorithm} e serializzazione è fornito in seguito in questo capitolo.
+
+\subsection{Cookies}
+
+È infine possibile utilizzare i cookies per la comunicazione tra finestre, laddove nemmeno gli eventi \texttt{Storage} siano possibili. La finestra che invia il messaggio lo serializza come stringa e lo scrive all'interno di un cookie del browser. La finestra ricevente è invece in ascolto tramite un timer che ogni tot millisecondi legge il cookie per capire se è stato cambiato. \\
+
+Per diversi motivi quali limiti di dimensione dei cookie, difficoltà di lettura/scrittura, performance e scalabilità è una soluzione assolutamente sconsigliata. \\
+
+Fortunatamente gli obiettivi obbligatori del progetto di stage richiedono il supporto solo di Google Chrome e Firefox, i quali supportano \textit{postMessage}. I browser invece supportati dal prodotto \textit{Route Manager}, ovvero fino ad Internet Explorer 11, supportano almeno gli eventi dello \texttt{Storage}, utilizzabili quindi come fallback.
+
+\subsection{Structured clone algorithm VS Serialization}
+
+Poiché la comunicazione è multi-finestra tra processi separati, è necessario purtroppo che i dati siano copiati da una finestra e l'altra per mantenersi sincronizzati. \\
+
+Lo "Structured clone algorithm" è un algoritmo per la copia di oggetti JavaScript complessi ed è utilizzato internamento per il trasferimento di dati attraverso \textit{postMessage} ed altre API JavaScript. Ciò che fa è realizzare una copia analizzando ricorsivamente l'oggetto input, ma mantenendo una mappa dei riferimenti visitati precedentemente per evitare di attraversare infinitamente strutture circolari. 
+
+Una struttura dati circolare consiste in un campo dell'oggetto il cui valore è il riferimento all'oggetto stesso in maniera diretta (\texttt{a -> a}) o indirettamente (\texttt{a -> b -> a}). \\
+
+Vantaggi dello \textit{Structured clone algorithm}:
+
+\begin{itemize}
+    \item Supporto per strutture circolari;
+    \item Supporto nativo per la copia di quasi qualsiasi tipo di oggetto JavaScript;
+    \item Non vi è bisogno di convertire in un formato e ricostruire l'oggetto originale da tale formato, essendo quindi sia più performante che evitando di rischiare la perdita di informazioni durante la conversione.
+\end{itemize}
+
+Svantaggi dello \textit{Structured clone algorithm}:
+
+\begin{itemize}
+    \item Non è possibile clonare oggetti \texttt{Error} e \texttt{Function};
+    \item Supportato dai browsers che supportano \textit{postMessage}
+\end{itemize}
+
+La serialization è invece una tecnica che consiste nel tradurre un oggetto JavaScript in un formato adatto per la trasmissione nelle rete o per il salvataggio. In JavaScript tale formato è una stringa JSON, comune anche ad altri linguaggi lato server.
+
+Vantaggi della \textit{Serialization}:
+
+\begin{itemize}
+    \item Adatto per la trasmissione nella rete;
+    \item Supportato da qualsiasi browser ed utilizza un formato comune ad altri linguaggi.
+\end{itemize}
+
+Svantaggi della \textit{Serialization}:
+
+\begin{itemize}
+    \item Non supporta strutture circolari di default;
+    \item Supporta solo un sotto-insieme dei tipi di oggetti, in particolare solo i formati definiti dallo standard JSON: numeri, stringhe, booleani, oggetti letterali ed array. Non supporta ad esempio strutture dati quali \texttt{Map, Set, Date, ArrayBuffer}, etc.;
+    \item Perdita di informazioni nella conversione oggetto <=> stringa JSON;
+    \item Calcolo computazionale per conversione e ricostruzione dell'oggetto originale.
+\end{itemize}
+
+\subsection{Conclusioni}
+
+Confrontando le diverse strategie per la comunicazione cross-page e la copia dei dati, è chiaro che la migliore sia l'utilizzo di \textit{postMessage}, il quale sfrutta lo \textit{Structured clone algorithm}. Difatti entrambi sono nati esattamente per uno scopo di comunicazione tra la pagina principale ed altre entità quali estensioni, altre finestre e Web Workers (spiegati in seguito).\\
+
+È invece possibile utilizzare la tecnica degli \textit{Eventi Storage} assieme alla \textit{Serialization} come fallback della libreria \textit{Stargate} qualora il browser di esecuzione non supporti la strategia \textit{postMessage}. Tuttavia a causa delle nette differenze comportamentali tra \textit{Structured clone algorithm} e \textit{Serialization}, gli utilizzatori della libreria sono avvertiti delle possibili complicazioni. Posso quindi decidere se affidarsi al fallback, qualora non utilizzino alcuna struttura dati non supportata dalla \textit{Serialization}, oppure disabilitare l'utilizzo di \textit{Stargate} se il browser non è moderno.\\
+
+Nel caso dell'azienda WorkWave per il prodotto \textit{Route Manager}, è stata decisa proprio la seconda opzione e disattivare l'interfaccia UI che permette di aprire la mappa Google Maps esternamente.
