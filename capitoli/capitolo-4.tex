@@ -67,6 +67,16 @@ Raggruppa tutte le pagine dello stesso sito nello stesso processo, indipendentem
 
 Esiste anche una strategie più semplice che dedica un processo renderer per ogni gruppo di tab. Per ovvi motivi è estremamente inefficiente.
 
+\subsection{Come forzare l'uso di un nuovo processo}
+
+Dalla descrizione precedente della strategia \textit{Process-per-site-instance}, sembrerebbe non sia possibile ottenere l'effetto desiderato per il progetto \textit{Stargate}. Si desidera difatti alloccare un processo dedicato ad ogni finestra, sebbene appartengano allo stesso sito e quindi contrariamente al comportamento della strategia \textit{Process-per-site-instance}. \\
+
+In seguito a diverse ricerche è tuttavia emerso che è possibile ottenere un processo dedicato come effetto collaterale di un parametro di sicurezza per la creazione delle nuove finestre. Nei browsers moderni è difatti possibile specificare un parametro \texttt{rel=noopener}, che evita exploits di sicurezza in cui la finestra padre è capace di accedere a riferimenti contenuti nella finestra figlia e/o viceversa. 
+
+Quest'ultimo comportamento di condivisione dei riferimento è necessario per il corretto funzionamento di molte applicazioni cross-page, ma pone gli utenti a rischio qualora le nuove finestre siano di dominio diverso e potenzialmente maligne. Tramite il parametro \texttt{rel=noopener} è invece possibile evitare qualsiasi riferimento tra le parti e per, salvaguardare la sicurezza della memoria, ogni finestra creata con tale parametro ha un proprio processo dedicato. \\
+
+Tramite quindi questa funzionalità, la libreria \textit{Stargate} è in grado di forzare un processo per ogni nuova finestra widget. L'altra faccia della medaglia, tuttavia, è la maggior difficoltà di comunicazione tra le finestre in quanto non si possiede più alcun riferimento JavaScript alle finestre. Per tale motivo si sono studiate diverse strategie di comunicazione cross-page, descritte nella prossima sezione.
+
 \section{Comunicazione cross-page}
 
 Nel corso degli anni vi sono state diverse strategie per la comunicazione cross-page tra pagine web in diversi tab, per soddisfare casi d'uso quali fare il check-out in una nuova pagina protetta di PayPal e notificare la pagina principale del risultato. Un altro esempio d'uso è la possibilità di avere una chat in una pagina separata, che tuttavia scambi informazioni con l'applicazione principale. Ed infine ovviamente il caso d'uso in questione, ovvero estrarre componenti UI per i monitor multipli. \\
