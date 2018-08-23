@@ -11,9 +11,13 @@ In questo capitolo viene presentata prima l'architettura multi-process dei brows
 
 In seguito si illustra invece lo stato dell'arte delle diverse soluzioni per la comunicazione cross-page in JavaScript tra pagine su tab diverse. \\
 
-Entrambe le sezioni fungono da spiegazione del contesto tecnologico in cui è stata sviluppata la soluzione \textit{Stargate}.
+Entrambe le sezioni fungono da spiegazione del contesto tecnologico in cui è stata sviluppata la soluzione \textit{Stargate} ed, al termine di esse, viene presentata una prima architettura naive per la libreria.
 
 \section{Architettura multi-processi}
+
+By design, JavaScript ha un modello di esecuzione single-threaded, ovvero tutte le sue istruzioni sono eseguite da un unico thread invece di averne diversi concorrenti. Ciò ha determinato la natura fortemente asincrona delle sue API, ove si cerca sempre di liberare il thread per i calcoli successivi appena possibile.
+
+Qualora invece sia eccessivo il lavoro computazionale di una parte dell'applicazione, il risultato porta ad un'interfaccia bloccata e non responsiva fino al termine del calcolo. Questo ha un pessimo effetto sull'utente, in quanto l'applicazione non risponde alle sue interazioni e sembra anzi congelata. Per tale motivo è essenziale in primis che \textit{Stargate} esegua le nuove finestre su processi separati, al fine di non appesantire l'applicazione padre. \\
 
 Quando la maggior parte dei browser moderni fu progettata inizialmente, le pagine web erano semplici e avevano poco o nessun codice attivo. Per tale motivo, i browser renderizzano tutte le pagine usando lo stesso processo, al fine di mantenere basso l'utilizzo delle risorse. \\
 
@@ -170,3 +174,26 @@ Confrontando le diverse strategie per la comunicazione cross-page e la copia dei
 È invece possibile utilizzare la tecnica degli \textit{Eventi Storage} assieme alla \textit{Serialization} come fallback della libreria \textit{Stargate} qualora il browser di esecuzione non supporti la strategia \textit{postMessage}. Tuttavia a causa delle nette differenze comportamentali tra \textit{Structured clone algorithm} e \textit{Serialization}, gli utilizzatori della libreria sono avvertiti delle possibili complicazioni. Posso quindi decidere se affidarsi al fallback, qualora non utilizzino alcuna struttura dati non supportata dalla \textit{Serialization}, oppure disabilitare l'utilizzo di \textit{Stargate} se il browser non è moderno.\\
 
 Nel caso dell'azienda WorkWave per il prodotto \textit{Route Manager}, è stata decisa proprio la seconda opzione e disattivare l'interfaccia UI che permette di aprire la mappa Google Maps esternamente.
+
+\section{Prima architettura Stargate}
+
+Alla luce delle precedenti informazioni, si illustra di seguito una prima architettura per la libreria \textit{Stargate} e verrà ampliata passo per passo nei prossimi capitoli. Con la strategia \textit{postMessage} è difatti possibile organizzare l'applicazione nel seguente modo, ove si instraura una comunicazione bilaterale in cui \textit{Parent} trasferisce lo stato applicativo ed i vari \textit{Widget} notificano di eventi. \\
+
+\begin{figure}[H] 
+  \centering 
+  \includegraphics[width=1\columnwidth]{postMessage} 
+  \caption{Prima architettura Stargate}
+\end{figure}
+
+\textbf{Parent}
+    \begin{itemize}
+        \item vive nella finestra principale ed è unica per sessione;
+        \item si occupa della creazione e comunicazione con le finestre widget, mandando lo stato applicativo dell'applicazione contenente i dati necessari ai vari widget;
+        \item gestisce gli eventi dei widget che necessitano di modificare lo stato applicativo dell'applicazione.
+    \end{itemize}
+\textbf{Widget}
+    \begin{itemize}
+        \item Vive in una finestra widget, creata dal \textit{Parent}
+        \item Riceve lo stato applicativo ed utilizza i dati in essa per la corretta rappresentazione UI. Ogni volta che lo stato cambia, si aggiorna automaticamente anche la UI;
+        \item Comunica al \textit{Parent} qualsiasi evento che abbia effetti sullo stato applicativo, ad esempio un'interazione utente.
+    \end{itemize}
