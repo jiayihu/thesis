@@ -8,7 +8,7 @@
         %%******************************************%%
 
 
-% I seguenti commenti speciali impostano:
+% I seguenti commenXeLaTeXti speciali impostano:
 % 1. 
 % 2. PDFLaTeX come motore di composizione;
 % 3. tesi.tex come documento principale;
@@ -21,11 +21,11 @@
 
 \documentclass[12pt,                    % corpo del font principale
                a4paper,                 % carta A4
-               twoside,                 % impagina per fronte-retro
+               oneside,                 % impagina per fronte-retro
                openright,               % inizio capitoli a destra
                english,                 
                italian,                 
-               ]{book}    
+               ]{memoir}    
 
 %**************************************************************
 % Importazione package
@@ -35,6 +35,9 @@
 
 \usepackage[T1]{fontenc}                % codifica dei font:
                                         % NOTA BENE! richiede una distribuzione *completa* di LaTeX
+
+\usepackage{times}
+\usepackage[headsep=.5in,left=1.5in,right=1.5in,top=1in,bottom=1in,footskip=.5in]{geometry}
 
 \usepackage[utf8]{inputenc}             % codifica di input; anche [latin1] va bene
                                         % NOTA BENE! va accordata con le preferenze dell'editor
@@ -104,6 +107,62 @@
                                         % 2. eseguire: biber tesi
                                         % 3. compilare ancora tesi.tex.
 
+\usepackage{kpfonts}
+
+%**************************************************************
+% Layout pagine
+%**************************************************************
+
+\setSingleSpace{1.1}
+\SingleSpacing
+\definecolor{chaptercolor}{gray}{0.8}
+\newcommand\numlifter[1]{\raisebox{-2cm}[0pt][0pt]{\smash{#1}}}
+\newcommand\numindent{\kern37pt}
+\newlength\chaptertitleboxheight
+\makechapterstyle{hansen}{
+  \renewcommand\printchaptername{\raggedleft}
+  \renewcommand\printchapternum{%
+    \begingroup%
+    \leavevmode%
+    \chapnumfont%
+    \strut%
+    \numlifter{\thechapter}%
+    \numindent%
+\endgroup%
+}
+  \renewcommand*{\printchapternonum}{%
+    \vphantom{\begingroup%
+      \leavevmode%
+      \chapnumfont%
+      \numlifter{\vphantom{9}}%
+      \numindent%
+      \endgroup}
+    \afterchapternum}
+  \setlength\midchapskip{0pt}
+  \setlength\beforechapskip{0.5\baselineskip}
+  \setlength{\afterchapskip}{3\baselineskip}
+  \renewcommand\chapnumfont{%
+    \fontsize{4cm}{0cm}%
+    \bfseries%
+    \sffamily%
+    \color{chaptercolor}%
+  }
+  \renewcommand\chaptitlefont{%
+    \normalfont%
+    \huge%
+    \bfseries%
+    \raggedleft%
+  }%
+  \settototalheight\chaptertitleboxheight{%
+    \parbox{\textwidth}{\chaptitlefont \strut bg\\bg\strut}}
+  \renewcommand\printchaptertitle[1]{%
+    \parbox[t][\chaptertitleboxheight][t]{\textwidth}{%
+      %\microtypesetup{protrusion=false}% add this if you use microtype
+      \chaptitlefont\strut ##1\strut}%
+}}
+\chapterstyle{hansen}
+\aliaspagestyle{chapter}{empty} % just to save some space
+
 \input{tesi-config}                     % file con le impostazioni personali
 
 \begin{document}
@@ -113,9 +172,12 @@
 \frontmatter
 \input{inizio-fine/frontespizio}
 \input{inizio-fine/colophon}
+\blankpage
 \input{inizio-fine/dedica}
 \input{inizio-fine/sommario}
+\blankpage
 \input{inizio-fine/ringraziamenti}
+\blankpage
 \input{inizio-fine/indici}
 \cleardoublepage
 
@@ -126,14 +188,14 @@
 \input{capitoli/capitolo-1}             % Introduzione
 \input{capitoli/capitolo-3}             % Stage
 \input{capitoli/capitolo-2}             % Processi
+\blankpage
 \input{capitoli/capitolo-4}             % Architettura cross-page
 \input{capitoli/capitolo-5}             % Worker e BroadcastChannel
 \input{capitoli/capitolo-6}             % Product Design Freeze e SOP
 \input{capitoli/capitolo-7}             % Conclusioni
 
+\appendix 
 \blankpage
-
-\appendix                               
 \input{capitoli/capitolo-A}             % Appendice A
 
 %**************************************************************
