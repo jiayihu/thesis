@@ -10,6 +10,12 @@
 %**************************************************************
 \section{Presentazione del progetto Stargate}
 
+\begin{figure}[H] 
+  \centering 
+  \includegraphics[width=0.35\columnwidth]{logo} 
+  \caption{Logo della libreria Stargate}
+\end{figure}
+
 Il progetto dello stage consiste nella realizzazione di una libreria \gls{TypeScript} per applicazioni web, che permetta di aprire qualsiasi componente di User Interface (UI) in una nuova pagina mantenendo lo stato sincronizzato con l'applicazione padre. Tale libreria è denominata \textbf{Stargate}, ispirandosi all'omonima serie televisiva di fantascienza incentrata su portali spaziali nelle diverse galassie. Idealmente la libreria dovrebbe funzionare per qualsiasi applicazione web scritta in \gls{JavaScript}, tuttavia il requisito obbligatorio minimale è che si integri con librerie \gls{React} e \gls{Redux} col minor sforzo possibile.\\
 
 La prima fase dello stage richiede dunque la realizzazione di un Proof of Concept che verifichi in vitreo la possibilità di spostare un componente UI React dalla finestra principale (\textit{padre}) verso una nuova \textit{figlia}, mantendo lo stato consistente. Tali componenti UI sono identificati col nome di \textit{widget}, qualora siano mostrati su una pagina separata.

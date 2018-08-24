@@ -3,10 +3,29 @@
 % !TEX root = ../tesi.tex
 
 %**************************************************************
-\chapter{Appendice A}
+\chapter{Tecnologie utilizzate}
 %**************************************************************
 
-\epigraph{Citazione}{Autore della citazione}
+\section{TypeScript}
 
+\begin{figure}[H] 
+  \centering 
+  \includegraphics[width=0.25\columnwidth]{ts} 
+  \caption{TypeScript}
+\end{figure}
 
+TypeScript è un linguaggio di programmazione open-source sviluppato e mantenuto da Microsoft. La sua sintassi è un super-set di JavaScript, ovvero qualsiasi sintassi di quest'ultima è valida anche in TypeScript ma non vice-versa. TypeScript aggiunge difatti la possibilità di avere tipi statici. \\
 
+TypeScript è progettato per lo sviluppo di grandi applicazioni e compila in JavaScript, per cui può essere usato sia per l'esecuzione lato client che server (Node.js). \\
+
+Il linguaggio fornisce i tipi statici attraverso \textit{type annotations} che attivano il controllo dei tipi a tempo di compilazione. La scelta è tuttavia opzionale ed è possibile scrivere normale codice JavaScript senza tipi. \\
+
+\begin{lstlisting}
+function add(left: number, right: number): number {
+  return left + right;
+}
+\end{lstlisting}
+
+I tipi statici possono anche essere esportati dopo la compilazione in file di dichiarazione separati, in modo da fornire le informazioni sui tipi a chi deve utilizzare la libreria, la quale sarà già stata compilata in JavaScript. \\
+
+Sia la libreria \textit{Stargate} che l'applicazione \textit{WorkWave Route Manager} sono scritte in TypeScript 3.0, rilasciato ad agosto 2018.
