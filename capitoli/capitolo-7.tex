@@ -63,4 +63,10 @@ Per ovvi motivi di performance, una volta chiamato il metodo, la finestra widget
 
 \subsection{Implementazione RPC tramite Proxy}
 
-Bla bla bla
+Ai fini di rendere la chiamata RPC trasparente nei confronti dell'utente, gli oggetti al primo livello di annidamento del \textit{Context} sono rimpiazzati da equivalenti \textit{Proxy}, che funzionano esattamente come gli originali ma racchiudono al loro interno la logica di comunicazione descritta poco prima.
+
+\begin{figure}[H] 
+  \centering 
+  \includegraphics[width=1\columnwidth]{proxy} 
+  \caption{Esempio di Proxy per GoogleMaps}
+\end{figure}
