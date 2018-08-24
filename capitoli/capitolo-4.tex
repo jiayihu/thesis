@@ -98,7 +98,7 @@ Il metodo \texttt{window.postMessage(message)} permette la comunicazione sicura 
 
 La finestra che riceve il messaggio può rimanere in ascolto attraverso la proprietà JavaScript \texttt{self.onmessage} che assegna alla propria pagina una funzione da invocare ogni volta che arriva un messaggio inviato da \textit{postMessage}.
 
-\begin{lstlisting}
+\begin{lstlisting}[language={[Sharp]C}]
 self.onmessage = function(message) {
     // Do something with message
 }
@@ -112,15 +112,15 @@ Laddove l'API dedicata alla comunicazione cross-page \textit{postMessage} non si
 
 Esempio di invio di dati:
 
-\begin{lstlisting}
-// Salva nel proprio storage, che e' tuttavia condiviso tra 
-// tab dello stesso dominio
+\begin{lstlisting}[language={[Sharp]C}]
+// Salva nel proprio storage, che e' tuttavia condiviso
+// tra tab dello stesso dominio
 window.localStorage.setItem('stargate-msg', message)
 \end{lstlisting}
 
 Esempio di ascolto di dati, ove si rimane in ascolto dell'evento di modifica dello Storage:
 
-\begin{lstlisting}
+\begin{lstlisting}[language={[Sharp]C}]
 window.addEventListener('storage', function(event) {
   const message = window.localStorage.getItem('stargate-msg')
 })

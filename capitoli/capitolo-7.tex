@@ -13,7 +13,7 @@ Si supponga difatti che il widget mappa utilizzi un'istanza \gls{singleton} dell
 
 In questo caso, il widget mappa ha dunque bisogno del seguente "contesto" per poter correttamente funzionare anche al di fuori della pagina principale: \\
 
-\begin{lstlisting}
+\begin{lstlisting}[language={[Sharp]C}]
 interface MapContext {
   googleMaps: GoogleMaps
   state: State

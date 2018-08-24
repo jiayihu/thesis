@@ -113,6 +113,9 @@
 % Layout pagine
 %**************************************************************
 
+\maxtocdepth{subsection}
+\setsecnumdepth{subsection}
+
 \setSingleSpace{1.1}
 \SingleSpacing
 \definecolor{chaptercolor}{gray}{0.8}
@@ -162,6 +165,15 @@
 }}
 \chapterstyle{hansen}
 \aliaspagestyle{chapter}{empty} % just to save some space
+
+\usepackage{titlesec}
+
+\titleformat{\section}
+  {\large}
+  {\thesection}{12pt}{\MakeUppercase}
+
+\makeevenhead{headings}{\small\thepage}{}{\footnotesize\leftmark}
+\makeoddhead{headings}{\footnotesize\rightmark}{}{\small\thepage}
 
 \input{tesi-config}                     % file con le impostazioni personali
 

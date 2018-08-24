@@ -18,7 +18,7 @@ Tutte le funzioni \textit{selectors} devono inoltre essere pure, ovvero ritornar
 
 Nel seguente esempio lo stato applicativo rappresenta un'applicazione che gestisce una lista di acquisti. Si immagini quindi di avere un widget UI che mostri il totale delle spese e che quindi necessiti di tale stato derivato.
 
-\begin{lstlisting}
+\begin{lstlisting}[language={[Sharp]C}]
 interface Purchase {
     name: number
     price: number
@@ -58,6 +58,12 @@ Una possibile soluzione potrebbe essere delegare tale calcolo nelle finestre fig
 L'ideale è difatti calcolare lo stato derivato per ciascun tipo di widget, ad esempio per tutte le finestre contenenti la mappa, una sola volta ad ogni modifica dello stato applicativo e propagare il risultato del calcolo ai widget. In tal modo l'onere computazionale è linearmente dipendente dal numero di \textbf{tipi di widget} attivi invece che dal numero totale di widget. Tuttavia tale calcolo allo stesso tempo non può avere nella finestra padre per le ragioni descritte sopra.
 
 \section{Web Worker}
+
+\begin{figure}[H] 
+  \centering 
+  \includegraphics[width=1\columnwidth]{worker} 
+  \caption{Comunicazione tra la pagine web ed il Web Worker}
+\end{figure}
 
 Un \textit{Web Worker} è un modo per una pagina web di eseguire del codice in un thread background, in grado di eseguire attività senza interferire con l'interfaccia utente. Nello specifico è un oggetto della classe \texttt{Worker}, creato passando come parametro il file che contiene il codice da eseguire nel thread separato. Tale thread non avrà alcun riferimento di memoria in comune con il main thread della pagina e viene considerato come un contesto di esecuzione separato. \\
 
