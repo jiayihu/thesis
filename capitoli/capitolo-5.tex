@@ -4,7 +4,7 @@
 
 %**************************************************************
 \chapter{Architettura per computazione parallela}
-\label{cap:progettazione-codifica}
+\label{cap:architettura-computazione-parallela}
 %**************************************************************
 
 La precedente architettura risponde all'esigenza di stabilire una comunicazione cross-page, ma lascia irrisolti diversi obiettivi del progetto. In questo capitolo viene invece presentata un'evoluzione di tale architettura, al fine di poter migliorare le performance di \textit{Stargate} ed offrire un sistema di gestione dei widget più indipendente.
@@ -59,7 +59,7 @@ L'ideale è difatti calcolare lo stato derivato per ciascun tipo di widget, ad e
 
 \section{Web Worker}
 
-Un \textit{Web Worker} è un modo per una pagina web di eseguire del codice in un thread background, in grado di eseguire attività senza interferire con l'interfaccia utente. Nello specifico è un oggetto della classe \texttt{Worker}, creato passando come parametro il file che contiene il codice da eseguire nel thread separato. \\
+Un \textit{Web Worker} è un modo per una pagina web di eseguire del codice in un thread background, in grado di eseguire attività senza interferire con l'interfaccia utente. Nello specifico è un oggetto della classe \texttt{Worker}, creato passando come parametro il file che contiene il codice da eseguire nel thread separato. Tale thread non avrà alcun riferimento di memoria in comune con il main thread della pagina e viene considerato come un contesto di esecuzione separato. \\
 
 È possibile eseguire qualsiasi tipo di codice all'interno del thread worker, con alcune eccezioni tuttavia. Ad esempio non è possibile manipolare direttamente i nodi HTML della pagina web o accedere ad API CSS/HTML. In generale un \textit{Worker} è da considerare un thread di calcolo computazione e non di manipolazione della pagina. \\
 
@@ -95,7 +95,7 @@ Alla luce delle conoscenze sui \textit{Web Workers} e sul \textit{BroadcastChann
   \caption{Architettura Stargate evoluta con Web Worker e BroadcastChannel}
 \end{figure}
 
-Le classi\textit{Parent} e \textit{Widget} sono divenute ora packages, in quanto contengono altre classi sottostanti tra cui quelle che gestiscono la comunicazione tramite \textit{BroadcastChannel}. \\
+Le classi \textit{Parent} e \textit{Widget} sono divenute ora packages, in quanto contengono altre classi sottostanti tra cui quelle che gestiscono la comunicazione tramite \textit{BroadcastChannel}. \\
 
 \textbf{ParentChannel}
     \begin{itemize}
