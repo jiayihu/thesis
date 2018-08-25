@@ -7,4 +7,74 @@
 \label{cap:integrazione}
 %**************************************************************
 
-Che palle.
+Le precedenti scelte architetturali, in particolare l'evoluzione per il supporto al concetto di \textit{Context} invece che stato applicativo, sono state dettate dalle esigenze dell'applicazione \textit{Route Manager}. Tuttavia nonostante ciò l'integrazione ha richiesto anche diverso lavoro significativo all'interno del codice sorgente dell'applicazione, in quanto logica necessaria puramente per il prodotto in questione per usufuire di \textit{Stargate}. Le modifiche architetturali alla libreria invece sono mirate e portare benefici a tutti i consumatori, non unicamente al prodotto \textit{Route Manager}. \\
+
+Di seguito sono presentate le principali sfide affrontate per l'integrazione.
+
+\section{Google Maps}
+
+L'aspetto più doloroso dell'integrazione è stato Google Maps, di tuttavia vitale importanza per un'applicazione di gestione rotte. Google Maps difatti non è stato progettato per un uso moderno e per motivi di compatibilità mantiene comportamenti che lo rendono inadatto all'uso immediato con \textit{Stargate}. \\
+
+Alcune istanze, in particolari della classe \texttt{LatLng} che rappresenta una coordinata geografica, non possiedono campi pubblici ma bensì espongono solo metodi pubblici per poter accedere ai valori di latitudine/longitudine. Tuttavia esse devono essere presenti nello stato applicativo in quanto rappresentano dati fondamentali per l'applicazione e le istanze forniscono i metodi per lavorare agevolmente con tali dati.
+
+Ciò causa però l'impossibilità di trasmetterli dall'applicazione principale verso il \textit{Web Worker} o i widget, in quanto è impossibile clonare una funzione. L'utilizzo di chiamate RPC §\ref{rpc} è invece proibitivo dato l'estremamente alto uso di tali istanze. \\
+
+\subsection{Google Maps Serialization}
+
+Ciò ha richiesto di poter configurare la strategia di copia dei dati durante la trasmissione tra le parti e soprattutto quindi di definirne una propria per Google Maps all'interno di \textit{Route Manager}. In particolare, poiché Google Maps supporta la serializzazione verso il formato JSON, è stato obbligatorio serializzare i dati prima della trasmissione di ogni messaggio e ripristinare alla ricezione.
+
+\begin{figure}[H] 
+  \centering 
+  \includegraphics[width=1\columnwidth]{serialization} 
+  \caption{Flusso della serializzazione per Google Maps}
+\end{figure}
+
+A causa dell'overhead aggiuntivo, vi è stata una particolare attenzione per l'implementazione delle funzioni di serializzazione e parsing che non puntano a soddisfare tutti i possibili casi d'uso di Google Maps, ma bensì solo quelli in uso nel \textit{Route Manager} con la miglior performance possibile. Il risultato è stato soddisfacente e l'interazione utente con i widget è fluida. \\
+
+L'utilizzo della serializzazione invece della copia tramite \textit{Structured clone algorithm} ha portato tuttavia ad altri problemi, in particolari quelli descritti nei contro di tale strategia alla sezione §\ref{structured-clone}. Ciò ha richiesto del lavoro in più ma non vi è stato nulla di bloccante ed, essendo problemi minori, sono tralasciati da questo documento.
+
+\subsection{Google Maps diffing}
+
+Per motivi analoghi, non è possibile calcolare la differenza tra due oggetti \texttt{LatLng} in quanto hanno solo metodi e non campi dati. In questo caso, l'algoritmo di default per \textit{diff \& patch} è stato esteso per supportare tali oggetti. \\
+
+In particolare l'algoritmo normalmente attraverso l'albero dell'oggetto, comparando ogni valore col suo precedente per calcolarne la differenza. In \textit{Route Manager}, tale algoritmo consente di normalizzare i sotto-alberi prima che vengano attraversi per il calcolo e dando quindi la possibilità, nodo per nodo, di rimpiazzare le istanze \texttt{LatLng} con valori che siano comparabili. 
+
+Una volta calcolata la differenza, nell'oggetto rappresentate il delta vengono ripristinate le istanze originali ed il delta è pronto per la serializzazione e trasmissione. \\
+
+Poiché la normalizzazione avviene in contemporanea all'attraversamente dell'albero, il costo di performance aggiuntivo è costante in quanto non vi sono maggiori attraversamenti.
+
+\begin{figure}[H] 
+  \centering 
+  \includegraphics[width=0.75\columnwidth]{normalization} 
+  \caption{Esempio di nodo \texttt{LatLng} sostituito con oggetto con campi comparabili}
+\end{figure}
+
+\subsection{ChannelStrategy}
+
+Data la necessità di poter configurare alcuni aspetti del funzionamento, la libreria \textit{Stargate} fornisce la possibilità di definire un'implementazione dell'interfaccia \texttt{ChannelStrategy}, utilizzata poi internamente per eseguire \textit{diff \& patch} e per sapere il formato dei messaggi. \\
+
+Di seguito si presenta gli aspetti salienti di tale interfaccia, tralasciando alcuni campi minori non menzionati nel documento. \\
+
+\begin{lstlisting}[language={[Sharp]C}]
+type Delta = Array<DeltaItem>
+type Diff<C, D> = (oldCtx: C, newCtx: C) => D | undefined
+type Patch<C, D> = (ctx: C, delta: D | undefined) => C
+
+interface ChannelStrategy<C, A, D, TransferFormat> {
+  diff: Diff<C, D>
+  patch: Patch<C, D>
+
+  transfer: (message: Message<MessageType, C, A, D>) => TransferFormat
+  receive: (message: TransferFormat) => Message<MessageType, C, A, D>
+}
+\end{lstlisting}
+
+La libreria fornisce già due implementazioni di tale interfaccia: \texttt{CloneStrategy} basato sullo \textit{Structured clone algorithm} e \texttt{SerializeStrategy} basato sulla Serialization. È tuttavia possibile per il consumatore utilizzare una propria implementazione. \\
+
+\texttt{ParentChannel, WorkerChannel} e \texttt{WidgetChannel} sono tutti configurabili con \texttt{ChannelStrategy} e solitamente viene usata la stessa per tutti e tre le classi, ma nulla vieta di usare diversi algoritmi tra le parti. È difatti possibile voler usare un algoritmo \textit{diff \& patch} estremamente ottimizzato per i widget sapendone le necessità e limiti.
+
+\begin{figure}[H] 
+  \centering 
+  \includegraphics[width=1\columnwidth]{strategy} 
+  \caption{Strategy Pattern per la configurazione di Stargate}
+\end{figure}
