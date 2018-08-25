@@ -67,7 +67,7 @@ Raggruppa tutte le pagine dello stesso sito nello stesso processo, indipendentem
 
 Esiste anche una strategie più semplice che dedica un processo renderer per ogni gruppo di tab. Per ovvi motivi è estremamente inefficiente.
 
-\subsection{Come forzare l'uso di un nuovo processo}
+\subsection{Come forzare l'uso di un nuovo processo}\label{forzare-processo}
 
 Dalla descrizione precedente della strategia \textit{Process-per-site-instance}, sembrerebbe non sia possibile ottenere l'effetto desiderato per il progetto \textit{Stargate}. Si desidera difatti alloccare un processo dedicato ad ogni finestra, sebbene appartengano allo stesso sito e quindi contrariamente al comportamento della strategia \textit{Process-per-site-instance}. \\
 

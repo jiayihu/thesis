@@ -30,7 +30,7 @@ A livello di architettura fortunatamente vi è poco da modificare, in quanto si 
   \caption{Architettura per il Context}
 \end{figure}
 
-\section{Remote Procedure Call (RPC)}
+\section{Remote Procedure Call (RPC)}\label{rpc}
 
 L'introduzione del \textit{Context} porta alla luce una nuova sfida: chiamate di metodi nella finestra padre da parte di widgets. Lo \textit{State} è infatti un'insieme di dati di sola lettura, ma l'istanza \texttt{GoogleMaps} viene invece utilizzata richiamandone metodi con passaggio di parametri e valori di ritorno attesi. \\
 
