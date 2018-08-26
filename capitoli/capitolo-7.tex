@@ -9,7 +9,7 @@
 
 L'ultimo step di evoluzione del progetto \textit{Stargate} consiste nell'astrazione \textbf{da stato applicativo a Context}, ovvero contesto di esecuzione dei componenti UI. Sebbene difatti lo stato applicativo rappresenti nella maggioranza dei casi tutto ciò di cui un widget ha bisogno da parte dell'applicazione principale, in alcuni casi è necessario poter accedere anche ad altri oggetti ed addirittura richiamare metodi dalla finestra padre. \\
 
-Si supponga difatti che il widget mappa utilizzi un'istanza \gls{singleton} della classe \texttt{GoogleMaps}, responsabile dei calcoli geografici attraverso le API di Google Maps e condivisa a molteplici componenti UI oltre alla mappa.
+Si supponga difatti che il widget mappa utilizzi un'ipotetica istanza \gls{singleton} della classe \texttt{GoogleMaps}, responsabile dei calcoli geografici attraverso le API di Google Maps e condivisa a molteplici componenti UI oltre alla mappa.
 
 In questo caso, il widget mappa ha dunque bisogno del seguente "contesto" per poter correttamente funzionare anche al di fuori della pagina principale: \\
 
@@ -20,7 +20,7 @@ interface MapContext {
 }
 \end{lstlisting}
 
-Si può notare come il precedente stato applicativo \texttt{State}, sia ora una delle proprietà del \textit{Context} della mappa e sicuramente la più importante. Tuttavia il passaggio da stato applicativo ad un concetto più generale di "contesto", permette anche l'aggiunta all'interfaccia di un campo per l'istanza singleton di \texttt{GoogleMaps}, senza dover inserire questi nello stato applicativo di cui non fa parte logicamente. 
+Si può notare come il precedente stato applicativo \texttt{State}, sia ora una delle proprietà del \textit{Context} della mappa e sicuramente la più importante. Tuttavia il passaggio da stato applicativo ad un concetto più generale di "contesto", permette anche l'aggiunta all'interfaccia di un campo per l'istanza singleton di \texttt{GoogleMaps}, senza dover inserire questi nello stato applicativo di cui non fa parte logicamente. \\
 
 A livello di architettura fortunatamente vi è poco da modificare, in quanto si tratta solamente di ampliare il concetto di stato applicativo a \textit{Context} e quindi di rinominare i termini. Si parla quindi di \textbf{Context e DerivedContext} invece che \textit{State e DerivedState}.
 
@@ -32,11 +32,11 @@ A livello di architettura fortunatamente vi è poco da modificare, in quanto si 
 
 \section{Remote Procedure Call (RPC)}\label{rpc}
 
-L'introduzione del \textit{Context} porta alla luce una nuova sfida: chiamate di metodi nella finestra padre da parte di widgets. Lo \textit{State} è infatti un'insieme di dati di sola lettura, ma l'istanza \texttt{GoogleMaps} viene invece utilizzata richiamandone metodi con passaggio di parametri e valori di ritorno attesi. \\
+L'introduzione del \textit{Context} porta però anche alla luce una nuova sfida: chiamate di metodi nella finestra padre da parte di widgets. Lo \textit{State} è infatti un'insieme di dati di sola lettura, ma l'istanza \texttt{GoogleMaps} viene invece utilizzata richiamandone metodi con passaggio di parametri e valori di ritorno attesi. \\
 
-Tuttavia l'applicazione principale, il \textit{Web Worker} ed i widget non hanno alcuna condivisione di memoria per cui apparentemente sembrerebbe impossibile per una finestra figlia richiamare un metodo di un oggetto esistente solo nel padre. Nel caso di istanze singleton come \textit{GoogleMaps} non è possibile che ogni widget abbia la sua copia dell'oggetto, poiché violerebbe proprio la definizione di singleton. \\
+Tuttavia l'applicazione principale, il \textit{Web Worker} ed i widget non hanno alcuna condivisione di memoria, per cui apparentemente sembrerebbe impossibile per una finestra figlia richiamare un metodo di un oggetto esistente solo nel padre. Nel caso di istanze singleton come \textit{GoogleMaps} non è possibile che ogni widget abbia la sua copia dell'oggetto, poiché violerebbe proprio la definizione di singleton. \\
 
-In questi casi è necessario utilizzare \textbf{Remote Procedure Call (RPC)}, ovvero chiamate chiamate di procedure che avvengono in uno spazio di memoria diverso (solitamente un altro dispositivo della rete), ma in maniera trasparente come normali chiamate locali a procedure/metodi. È desiderabile infatti che il chiamante del \textit{metodo RPC} non conosca i dettagli implementativi della chiamata remota sottostante.
+In questi casi è necessario utilizzare \textbf{Remote Procedure Call (RPC)}, ovvero chiamate di procedure che avvengono in uno spazio di memoria diverso (solitamente un altro dispositivo della rete), ma in maniera trasparente come normali chiamate locali a procedure/metodi. È desiderabile infatti che il chiamante del \textit{metodo RPC} non conosca i dettagli implementativi della chiamata remota sottostante.
 
 In Java vi è un'implementazione delle chiamate RPC attraverso le \textit{Remote method invocations (RMI)}. \\
 
@@ -52,7 +52,7 @@ Nel caso del progetto \textit{Stargate}, quando il widget esegue una chiamata di
   \item Il chiamante riceve il valore di ritorno e può proseguire con il resto della procedura
 \end{enumerate}
 
-Per ovvi motivi di performance, una volta chiamato il metodo, la finestra widget mette in pausa la procedura asincrona e prosegue con altre attività evitando di rimanere bloccata in attesa della risposta. L'inconveniente è difatti che tutte le chiamate di metodi nel \textit{Context} diventano asincrone, anche qualora fossero originariamente sincrone.
+Per ovvi motivi di performance, una volta chiamato il metodo, la finestra widget mette in pausa la procedura asincrona e prosegue con altre attività evitando di rimanere bloccata in attesa della risposta. L'inconveniente è difatti che tutte le chiamate di metodi nel \textit{Context} diventano forzatamente asincrone, anche qualora fossero originariamente sincrone.
 
 \begin{figure}[H] 
   \centering 
@@ -63,10 +63,14 @@ Per ovvi motivi di performance, una volta chiamato il metodo, la finestra widget
 
 \subsection{Implementazione RPC tramite Proxy}
 
-Ai fini di rendere la chiamata RPC trasparente nei confronti dell'utente, gli oggetti al primo livello di annidamento del \textit{Context} sono rimpiazzati da equivalenti \textit{Proxy}, che funzionano esattamente come gli originali ma racchiudono al loro interno la logica di comunicazione descritta poco prima.
+Ai fini di rendere la chiamata RPC trasparente nei confronti dell'utente, gli oggetti al primo livello di annidamento del \textit{Context} sono rimpiazzati da equivalenti \textit{Proxy}.
+
+Un \textit{Proxy} è solitamente un contenitore che funziona come interfaccia di un altro oggetto, il cui scopo può essere semplicemente delegare a quest'ultimo o fornire logica extra per eseguire una connessione network, leggere da un file, ottenere risorse costose ed etc.
+
+Nel caso della libreria, i \textit{Proxy} degli oggetti nel \textit{Context} funzionano esattamente come gli originali, ma racchiudono al loro interno la logica di comunicazione RPC descritta poco prima.
 
 \begin{figure}[H] 
   \centering 
   \includegraphics[width=1\columnwidth]{proxy} 
-  \caption{Esempio di Proxy per GoogleMaps}
+  \caption{Esempio del pattern Proxy per GoogleMaps}
 \end{figure}
