@@ -20,13 +20,13 @@ Il progetto dello stage consiste nella realizzazione di una libreria \gls{TypeSc
 
 Idealmente la libreria dovrebbe funzionare per qualsiasi applicazione web scritta in \gls{JavaScript}, tuttavia il requisito obbligatorio minimale è che si integri con librerie \gls{React} e \gls{Redux} col minor sforzo possibile.\\
 
-La prima fase dello stage richiede dunque la realizzazione di un Proof of Concept che verifichi in vitreo la possibilità di spostare un componente UI React dalla finestra \textit{padre} verso una nuova finestra \textit{figlia}, mantendo lo stato consistente. Tali componenti UI sono identificati col termine \textit{widget}, qualora siano mostrati su una pagina separata. \\
+La prima fase dello stage richiede dunque la realizzazione di un Proof of Concept che verifichi in vitreo la possibilità di spostare un componente UI React dalla finestra \textit{padre} verso una nuova finestra \textit{figlia}, mantenendo lo stato consistente. Tali componenti UI sono identificati col termine \textit{widget}, qualora siano mostrati su una pagina separata. \\
 
-Un widget deve continuare a visualizzare i dati provenienti dal padre e, se questi si aggiornano, anche il componente nella finestra figlia deve aggiornarsi consistemente. Viceversa le interazioni utente nel componente devono essere propagate alla pagina principale. In sostanza, il componente deve esibire lo stesso comportamento di quando si trovi nell'applicazione principale, sebbene fisicamente si trovi su una diversa pagina del browser. \\
+Un widget deve continuare a visualizzare i dati provenienti dal padre e, se questi si aggiornano, anche il componente nella finestra figlia deve aggiornarsi consistentemente. Viceversa le interazioni utente nel componente devono essere propagate alla pagina principale. In sostanza, il componente deve esibire lo stesso comportamento di quando si trovi nell'applicazione principale, sebbene fisicamente si trovi su una diversa pagina del browser. \\
 
 Infine non vi devono essere vincoli sul numero di componenti aperte in contemporanea su pagine diverse, sia che siano componenti di tipologia diversa sia che siano la stessa classe istanziata molteplici volte ma indipendentemente tra loro.\\
 
-In secondo luogo, è necessario integrare \textit{Stargate} all'interno del prodotto \textit{Route Manager} implementando la possibilità di estrarre la mappa Google Maps su una nuova pagina. L'obiettivo è permettere all'utente di visualizzare le informazioni sulla mappa secondo molteplici prospettive a sua discrezione, ad esempio mostrandolo tutti i veicoli su una pagina ed invece una singola rotta real-time su un'altra. Inoltre permette di usufuire della mappa su schermi multipli, funzionalità fortemente desiderata in quanto la mole delle informazioni a schermo è elevata e l'applicazione principale mostra difficoltà nel visualizzarle tutte in una sola pagina web.\\
+In secondo luogo, è necessario integrare \textit{Stargate} all'interno del prodotto \textit{Route Manager} implementando la possibilità di estrarre la mappa Google Maps su una nuova pagina. L'obiettivo è permettere all'utente di visualizzare le informazioni sulla mappa secondo molteplici prospettive a sua discrezione, ad esempio mostrandolo tutti i veicoli su una pagina ed invece una singola rotta real-time su un'altra. Inoltre permette di usufruire della mappa su schermi multipli, funzionalità fortemente desiderata in quanto la mole delle informazioni a schermo è elevata e l'applicazione principale mostra difficoltà nel visualizzarle tutte in una sola pagina web.\\
 
 Lo sviluppo di \textit{Stargate} dovrà dunque avere le seguenti caratteristiche:
 
@@ -154,7 +154,7 @@ Si è quindi proceduto a elaborare delle possibili soluzioni per far fronte a ta
 
 L'azienda WorkWave spera grazie allo stage di poter implementare una funzionalità fortemente desiderata nei loro prodotti software, in particolare in \textit{Route Manager}, con la possibilità di mostrare su pagine diverse qualsiasi componente dell'interfaccia. Ciò apre difatti le porte per una serie di possibili nuove interazioni da parte dell'utente. \\
 
-La prima immediata conseguenza è il poter mostrare la mappa Google Maps su un monitor esterno ed in full-screen, estremamente utile sia durante i meeting che negli uffici del clienti del \textit{Route Manager} per tenere sotto costante monitoraggio le rotte ed i veicoli. Il tutto mantendo contemporeaneamente aperta l'applicazione principale su un'altra pagina, ove poter fare le modifiche alle pianificazioni ed altre attività. \\
+La prima immediata conseguenza è il poter mostrare la mappa Google Maps su un monitor esterno ed in full-screen, estremamente utile sia durante i meeting che negli uffici del clienti del \textit{Route Manager} per tenere sotto costante monitoraggio le rotte ed i veicoli. Il tutto mantenendo contemporaneamente aperta l'applicazione principale su un'altra pagina, ove poter fare le modifiche alle pianificazioni ed altre attività. \\
 
 Un ulteriore caso d'uso è la possibilità di aprire qualsiasi componente in una nuova pagina, permettendo agli utenti di customizzare i propri flussi di lavoro in modo da tenere sempre aperte alcuni widget durante la navigazione all'interno dell'applicazione. \\
 
@@ -166,5 +166,5 @@ Ho intrapreso questo stage con l'obiettivo primario di venire in contatto con un
 
 È altresì importante professionalmente il contatto con i processi lavorativi di un'azienda che opera a livello world-wide, ma cercando al coltempo di mantenersi agile ed efficiente. È stata difatti concordata la possibilità di partecipare agli \gls{standup} e sono stati spiegati gli strumenti di pianificazione e comunicazione interni. \\
 
-Ritengo inoltre indispensabile confrontarmi con colleghi molto più esperti e con maggiore esperienza, in particolare il tutor Matteo Ronchi, che ha condiviso pazientemente le ragioni dietro decisioni architteturale apprese grazie alla sua esperienza in progetti passati. 
-Infine è molto istruttivo rendersi conto dell livello delle conoscenze richieste per realizzare ed evolvere un prodotto complesso come \textit{Route Manager}, sia a livello di Design/User Experience che di sviluppo tecnico.
+Ritengo inoltre indispensabile confrontarmi con colleghi molto più esperti e con maggiore esperienza, in particolare il tutor Matteo Ronchi, che ha condiviso pazientemente le ragioni dietro decisioni architetturale apprese grazie alla sua esperienza in progetti passati. 
+Infine è molto istruttivo rendersi conto del livello delle conoscenze richieste per realizzare ed evolvere un prodotto complesso come \textit{Route Manager}, sia a livello di Design/User Experience che di sviluppo tecnico.

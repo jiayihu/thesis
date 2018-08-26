@@ -23,7 +23,7 @@ Quando la maggior parte dei browser moderni fu progettata inizialmente, le pagin
 
 Tuttavia, le pagine web odierne sono decisamente più attive a partire da siti, statici ma con tanto uso di JavaScript, fino a vere e proprie applicazioni web come Gmail. Grosse parti di queste applicazioni girano all'interno del browser, così come le normali applicazioni eseguono in un sistema operativo e, proprio similmente a questi, il browser deve dunque tenere le applicazioni separate tra di loro. \\
 
-Oltre a ciò, le parti del browser che renderizzano HTML, JavaScript e CSS sono diventate straordinariamente complesse nel corso del tempo. Diventa perciò palese che browsers i quali pongano tutto il lavoro in un processo affrontano seri problemi di rubustezza, responsitività e sicurezza. \\
+Oltre a ciò, le parti del browser che renderizzano HTML, JavaScript e CSS sono diventate straordinariamente complesse nel corso del tempo. Diventa perciò palese che browsers i quali pongano tutto il lavoro in un processo affrontano seri problemi di robustezza, responsività e sicurezza. \\
 
 Se un'applicazione web causasse un crash nel rendering engine, porterebbe la terminazione anche delle altre pagine web aperte. Le applicazioni web inoltre competono reciprocamente per l'uso della CPU ed ognuna di esse è single-thread per design di JavaScript, per cui rischierebbero di diventare non responsive alle interazioni utente. Infine anche la sicurezza è un fattore in rischio poiché una pagina web potrebbe sfruttare vulnerabilità del browser per accedere a dati delle altre pagine nello stesso processo.
 
@@ -38,14 +38,14 @@ Se un'applicazione web causasse un crash nel rendering engine, porterebbe la ter
 Il browser crea tre differenti tipi di processi: browser, renderer ed estensioni.
 
 \begin{itemize}
-    \item \textbf{Browser}: esiste un unico processo browser, il quale gestisce i tab, le finestre ed il browser stesso. Gestisce inoltre tutti i collegamenti delle pagine con il file system, la rete, input utente etc. ma non esegue alcun contenuto delle pagine;
+    \item \textbf{Browser}: esiste un unico processo browser, il quale gestisce i tabs, le finestre ed il browser stesso. Gestisce inoltre tutti i collegamenti delle pagine con il file system, la rete, input utente etc. ma non esegue alcun contenuto delle pagine;
     \item \textbf{Renderer}: il processo browser crea molteplici processi renderer, ognuno responsabile per la visualizzazione di una pagina web. I processi renderer contengono la complessa logica per la gestione di HTML, CSS, JavaScript, immagini e così via. Google Chrome, Safari ed altri utilizzano un rendering engine basato sul progetto open-source WebKit, mentre Firefox ed Edge hanno il proprio;
     \item \textbf{Estensioni}: il processo browser crea anche un processo per ogni estensione come il famoso Adblock.
 \end{itemize}
 
 \subsection{Strategie multi-process}
 
-Una volta che il browser ha creato il processo omonimo, crea un processo renderer per ogni istanza di pagina web visitata dall'utente. Può essere pensato come un processo separato per ogni tab del browser, ma con l'eccezione di consentire a due tabs di convidere lo stesso processo qualora siano collegati tra di loro e mostrino lo stesso sito. \\
+Una volta che il browser ha creato il processo omonimo, crea un processo renderer per ogni istanza di pagina web visitata dall'utente. Può essere pensato come un processo separato per ogni tab del browser, ma con l'eccezione di consentire a due tabs di condividere lo stesso processo qualora siano collegati tra di loro e mostrino lo stesso sito. \\
 
 Per esempio, se un tab ne apre un altro usando JavaScript o se viene aperto un link verso lo stesso sito in un nuovo tab, questi condivideranno lo stesso processo renderer. Si permette così ai tabs correlati di comunicare via JavaScript e condividere la cache. Al contrario, se viene aperta una pagina di un sito diverso verrà riservato un nuovo processo. \\
 
@@ -106,11 +106,11 @@ self.onmessage = function(message) {
 }
 \end{lstlisting}
 
-Nel caso di \textit{Stargate} non sono disponibili i riferimenti alle nuove finestre, in quanto risiedono su nuovi processi, per cui non è possibile usare \textit{postMessage} direttamente con essi. Il capitolo sucessivo §\ref{cap:architettura-computazione-parallela} fornisce la soluzione a questo problema, usando lo stesso metodo con altre vie di comunicazione.
+Nel caso di \textit{Stargate} non sono disponibili i riferimenti alle nuove finestre, in quanto risiedono su nuovi processi, per cui non è possibile usare \textit{postMessage} direttamente con essi. Il capitolo successivo §\ref{cap:architettura-computazione-parallela} fornisce la soluzione a questo problema, usando lo stesso metodo con altre vie di comunicazione.
 
 \subsection{Eventi Storage}
 
-Laddove l'API dedicata alla comunicazione cross-page \textit{postMessage} non si possa utilizzare, ad esempio su browsers meno moderni o perché non è possibile ottenere un riferimento alla finestra, è possibile usare gli eventi dello \texttt{Storage}. I browsers forniscono difatti delle API per la lettura e scrittura di dati persistenti anche dopo la chiusura della pagina. Inoltre lo storage è condiviso tra tutte le pagine aventi lo stesso dominio. \\
+Laddove l'API dedicata alla comunicazione cross-page \textit{postMessage} non si possa utilizzare, ad esempio su browsers meno moderni o perché non è possibile ottenere un riferimento alla finestra, è possibile usare gli eventi dello \texttt{Storage}. I browsers forniscono difatti delle API per la lettura e scrittura di dati persistenti anche dopo la chiusura della pagina. Inoltre lo Storage è condiviso tra tutte le pagine aventi lo stesso dominio. \\
 
 È quindi dunque possibile usare tali API per comunicare tra le finestre. \\
 
@@ -201,7 +201,7 @@ Nel caso dell'azienda WorkWave per il prodotto \textit{Route Manager}, è stata 
 
 Alla luce delle precedenti informazioni, si illustra di seguito una prima architettura per la libreria \textit{Stargate}. Tale architettura verrà ampliata passo per passo nei prossimi capitoli. \\
 
-Con la strategia \textit{postMessage} è possibile organizzare l'applicazione nel seguente modo, ove si instraura una comunicazione bilaterale in cui \textit{Parent} trasferisce lo stato applicativo ed i vari \textit{Widget} notificano gli eventi. \\
+Con la strategia \textit{postMessage} è possibile organizzare l'applicazione nel seguente modo, ove si instaura una comunicazione bilaterale in cui \textit{Parent} trasferisce lo stato applicativo ed i vari \textit{Widget} notificano gli eventi. \\
 
 \begin{figure}[H] 
   \centering 

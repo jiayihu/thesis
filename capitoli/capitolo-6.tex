@@ -33,7 +33,7 @@ D'altra parte è inutilmente dispendioso il continuo invio di tutto lo stato app
   \caption{Sequenza delle chiamate per il flusso diff \& patch}
 \end{figure}
 
-Si assicura in tal modo che le dimensioni del carico di trasmissione siano dipendenti unicamente dal numero di modifiche effettuate. Quest'ultime sono previste essere frequenti ma è ragionevole presuporre che ogni modifica statisticamente cambi solo una piccola porzione dello stato applicativo, risultando quindi in piccoli \textit{delta}. \\
+Si assicura in tal modo che le dimensioni del carico di trasmissione siano dipendenti unicamente dal numero di modifiche effettuate. Quest'ultime sono previste essere frequenti ma è ragionevole presupporre che ogni modifica statisticamente cambi solo una piccola porzione dello stato applicativo, risultando quindi in piccoli \textit{delta}. \\
 
 \section{Ottimizzazione per immutable state}
 
@@ -89,7 +89,7 @@ Una possibile rappresentazione della precedente modifica \textit{immutable} è i
 
 Strutture dati che preservano sempre la propria precedente versione in caso di modifica si chiamano \textbf{strutture dati persistenti} \footnote{\url{https://en.wikipedia.org/wiki/Persistent_data_structure}} e sono immutabili in quanto le loro operazioni non mutano direttamente la struttura, ma bensì generano sempre una nuova aggiornata. \\
 
-Tali strutture dati sono fondamentali nei linguaggi di programmazione funzionali, ma nei recenti anni sono divenute fondamentali anche per linguaggi non puramente funzionali come JavaScript in quanto portano a diversi vantaggi come la diminuizione di \textit{side-effects}.
+Tali strutture dati sono fondamentali nei linguaggi di programmazione funzionali, ma nei recenti anni sono divenute fondamentali anche per linguaggi non puramente funzionali come JavaScript in quanto portano a diversi vantaggi come la diminuzione di \textit{side-effects}.
 
 \subsection{Ottimizzazione dell'algoritmo}
 
