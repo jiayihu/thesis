@@ -1,5 +1,7 @@
 # Bachelor degree thesis: Stargate
 
+![](immagini/logo.png)
+
 **The language of the document is Italian for the time being.**
 
 The document is the final report of my work during the internship in WorkWave Italy, for the Bachelor Degree in Computer Science.
