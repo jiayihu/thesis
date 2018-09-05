@@ -55,7 +55,7 @@ In particolare il codice JavaScript dell'applicazione principale è eseguito in 
 
 Una possibile soluzione potrebbe essere delegare tale calcolo nelle finestre figlie, poiché vivono su processi dedicati. Sebbene sia accettabile, non è ottimale in quanto il calcolo dei \textit{selectors} sarebbe ripetuto pur essendo identico per due finestre aventi entrambe la stessa tipologia di widget, per cui esiste un'alternativa migliore. \\
 
-L'ideale è difatti calcolare lo stato derivato per ciascun tipo di widget una sola volta ad ogni modifica dello stato applicativo e propagare il risultato del calcolo ai widget, ad esempio a tutte le finestre contenenti la mappa. In tal modo l'onere computazionale è linearmente dipendente dal numero di \textbf{tipi di widget} attivi invece che dal numero totale di finestre. Tuttavia tale calcolo allo stesso tempo non può avere nella finestra padre per le stesse ragioni descritte sopra riguardo al eseguirlo in quelle figlie.
+L'ideale è difatti calcolare lo stato derivato per ciascun tipo di widget una sola volta ad ogni modifica dello stato applicativo e propagare il risultato del calcolo ai widget, ad esempio a tutte le finestre contenenti la mappa. In tal modo l'onere computazionale è linearmente dipendente dal numero di \textbf{tipi di widget} attivi invece che dal numero totale di finestre. Tuttavia tale calcolo allo stesso tempo non può avvenire nella finestra padre per le stesse ragioni descritte sopra riguardo al eseguirlo in quelle figlie.
 
 \section{Web Worker}\label{webworker}
 
@@ -69,7 +69,7 @@ Un \textit{Web Worker} è un modo per una pagina web di eseguire del codice in u
 
 È possibile eseguire qualsiasi tipo di codice all'interno del thread worker, con alcune eccezioni tuttavia. Ad esempio non è possibile manipolare direttamente i nodi HTML della pagina web o accedere ad API CSS/HTML. In generale un \textit{Web Worker} è da considerare un thread di calcolo computazione e non di manipolazione della pagina. \\
 
-Un aspetto positivo è invece il sistema di comunicazione tra il worker and il thread principale dell'applicazione web, in quanto avviene anch'esso via \textit{postMessage} come se fosse tra finestre. Infine i \textit{Web Workers} possono attivare nuovi workers per delegare ulteriormente del lavoro in nuovi threads. \\
+Un aspetto positivo è invece il sistema di comunicazione tra il worker e il thread principale dell'applicazione web, in quanto avviene anch'esso via \textit{postMessage} come se fosse tra finestre. Infine i \textit{Web Workers} possono attivare nuovi workers per delegare ulteriormente del lavoro in nuovi threads. \\
 
 È quindi chiaro che un \textit{Web Worker} è il candidato ideale in \textit{Stargate} per l'esecuzioni dei \textit{selectors}. Nello specifico si desidera calcolare in un thread apposito lo stato derivato per ciascuna tipologia di widget, salvarla in cache ed inviarla a tutti i widget attivi di tale tipologia. Salvando in cache, è possibile renderizzare istantaneamente un widget alla sua apertura in quanto lo stato derivato necessario è stato già calcolato precedentemente.
 

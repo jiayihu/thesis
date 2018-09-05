@@ -9,23 +9,23 @@
 
 Le precedenti scelte architetturali, in particolare l'evoluzione per il supporto al concetto di \textit{Context} invece che stato applicativo, sono state dettate dalle esigenze dell'applicazione WorkWave \textit{Route Manager}. 
 
-Tuttavia nonostante ciò l'integrazione ha richiesto anche un significativo lavoro all'interno del codice sorgente dell'applicazione, con aggiunta di logica necessaria puramente per il prodotto in questione per usufruire di \textit{Stargate}. \\
+Tuttavia nonostante ciò l'integrazione ha richiesto anche un significativo lavoro aggiuntivo all'interno dell'applicazione, con aggiunta di logica necessaria puramente per il prodotto in questione per poter usufruire di \textit{Stargate}. \\
 
-Le modifiche architetturali alla libreria invece sono mirate e portare benefici a tutti i consumatori, non unicamente al prodotto \textit{Route Manager}. \\
+Tali modifiche sono quindi locali al prodotto, mentre le modifiche architetturali alla libreria invece sono mirate a portare benefici a tutti i consumatori, non unicamente all'applicazione \textit{Route Manager}. \\
 
 Di seguito sono presentate le principali sfide affrontate per l'integrazione.
 
 \section{Google Maps}
 
-L'aspetto più doloroso dell'integrazione è stato Google Maps, tuttavia di vitale importanza per un'applicazione di gestione rotte. Google Maps difatti non è stato progettato per un uso moderno in \textit{Web Workers} e per motivi di compatibilità mantiene comportamenti che lo rendono inadatto all'uso immediato con \textit{Stargate}. \\
+L'aspetto più doloroso dell'integrazione è stato Google Maps, tuttavia di vitale importanza per un'applicazione di gestione rotte. Google Maps difatti non è stato progettato per un uso moderno in \textit{Web Workers} e per motivi di compatibilità mantiene comportamenti che lo rendono inadatto all'utilizzo immediato con \textit{Stargate}. \\
 
-Alcune istanze, in particolari della classe \texttt{LatLng} che rappresenta una coordinata geografica, non possiedono campi pubblici ma bensì espongono solo metodi pubblici per poter accedere ai valori di latitudine/longitudine. Tuttavia esse devono essere presenti nello stato applicativo in quanto rappresentano dati fondamentali per l'applicazione e le istanze forniscono i metodi per lavorare agevolmente con tali dati.
+Alcune istanze, in particolari della classe \texttt{LatLng} che rappresenta una coordinata geografica, non possiedono campi pubblici ma bensì espongono solo metodi pubblici per poter accedere ai valori di latitudine/longitudine. Tuttavia esse devono essere presenti nello stato applicativo in quanto rappresentano dati fondamentali per l'applicazione e le istanze forniscono i metodi per lavorare agevolmente con tali dati. \\
 
 Ciò causa però l'impossibilità di trasmetterli dall'applicazione principale verso il \textit{Web Worker} o i widgets, in quanto è impossibile clonare una funzione. L'utilizzo di chiamate RPC §\ref{rpc} è invece proibitivo dato l'estremo alto uso di tali istanze, anche da parte di parti interni di Google Maps ove non è possibile riscrivere il codice affinché gestisca le chiamate RPC asincrone. \\
 
 \subsection{Google Maps serialization}
 
-Il problema ha richiesto di poter configurare la strategia di copia dei dati in \textit{Stargate} durante la trasmissione tra le parti e soprattutto quindi di definirne una propria per Google Maps all'interno di \textit{Route Manager}. In particolare, poiché Google Maps supporta la serializzazione verso il formato \gls{JSON}, è stato obbligatorio serializzare i dati prima della trasmissione di ogni messaggio e ripristinare alla ricezione.
+Il problema ha richiesto di poter configurare la strategia di copia dei dati durante la trasmissione tra le parti in \textit{Stargate} e soprattutto quindi di definirne una propria per Google Maps all'interno di \textit{Route Manager}. In particolare, poiché Google Maps supporta la serializzazione verso il formato \gls{JSON}, è stato obbligatorio serializzare i dati prima della trasmissione di ogni messaggio e ripristinare alla ricezione.
 
 \begin{figure}[H] 
   \centering 
@@ -33,15 +33,15 @@ Il problema ha richiesto di poter configurare la strategia di copia dei dati in 
   \caption{Flusso della serializzazione per Google Maps}
 \end{figure}
 
-A causa dell'overhead aggiuntivo, vi è stata una particolare attenzione per l'implementazione delle funzioni di serializzazione e parsing, che non puntano a soddisfare tutti i possibili casi d'uso di Google Maps, ma bensì solo quelli in uso nel \textit{Route Manager} con la miglior performance possibile. Il risultato è stato soddisfacente e l'interazione utente con i widgets è fluida. \\
+A causa dell'overhead aggiuntivo, vi è stata una particolare attenzione per l'implementazione delle funzioni di serializzazione e parsing, che non puntano a soddisfare tutti i possibili casi d'uso di Google Maps, ma bensì solo quelli in uso nel \textit{Route Manager} con la miglior performance possibile. Il risultato è stato soddisfacente e l'interazione utente con i widgets è rimasta fluida. \\
 
-L'utilizzo della serializzazione invece della copia tramite \textit{Structured clone algorithm} ha portato tuttavia ad altri problemi, in particolari quelli descritti come svantaggi di tale strategia alla sezione §\ref{structured-clone}. Ciò ha richiesto del lavoro in più ma non vi è stato nulla di bloccante ed, essendo problemi minori, sono tralasciati da questo documento.
+L'utilizzo della serializzazione invece della copia tramite \textit{Structured clone algorithm} ha portato tuttavia ad altri problemi, in particolari quelli descritti come svantaggi di tale strategia alla sezione §\ref{structured-clone}. Ciò ha richiesto del lavoro in più ma non vi è stato nulla di bloccante, ed essendo problemi minori, sono tralasciati da questo documento.
 
 \subsection{Google Maps diffing}
 
 Per motivi analoghi, non è possibile calcolare la differenza tra due oggetti \texttt{LatLng} in quanto hanno solo metodi e non campi dati. In questo caso, l'algoritmo di default per \textit{diff \& patch} è stato esteso in \textit{Route Manager} per supportare tali oggetti. \\
 
-In particolare l'algoritmo normalmente attraversa l'albero dell'oggetto, comparando ogni valore col suo precedente per calcolarne la differenza. In \textit{Route Manager}, tale algoritmo consente di normalizzare i sotto-alberi prima che vengano attraversati per il calcolo e dando quindi la possibilità, nodo per nodo, di rimpiazzare le istanze \texttt{LatLng} con valori che siano comparabili. 
+In particolare l'algoritmo normalmente attraversa l'albero dell'oggetto, comparando ogni valore col suo precedente per calcolarne la differenza. In \textit{Route Manager}, tale algoritmo consente di trasformare i sotto-alberi prima che vengano attraversati per il calcolo e dando quindi la possibilità, nodo per nodo, di rimpiazzare le istanze \texttt{LatLng} con valori che siano comparabili. 
 
 Una volta calcolata la differenza, nell'oggetto \textit{delta} vengono ripristinate le istanze originali di Google Maps ed il delta è pronto per la serializzazione e trasmissione. \\
 

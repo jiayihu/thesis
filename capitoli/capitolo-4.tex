@@ -49,9 +49,9 @@ Una volta che il browser ha creato il processo omonimo, crea un processo rendere
 
 Per esempio, se un tab ne apre un altro usando JavaScript o se viene aperto un link verso lo stesso sito in un nuovo tab, questi condivideranno lo stesso processo renderer. Si permette così ai tabs correlati di comunicare via JavaScript e condividere la cache. Al contrario, se viene aperta una pagina di un sito diverso verrà riservato un nuovo processo. \\
 
-Per essere precisi, si definisce un "sito" come un dominio registrato (ad esempio \texttt{google.come} o \texttt{bbc.co.uk}) e racchiude anche i sotto-domini (\texttt{mail.google.com}) e le porte (\texttt{google.com:8080}). Un' "istanza di sito" è invece un'insieme di pagine collegate provenienti dallo stesso sito. Due pagine sono considerate connesse se vi sono riferimenti reciproci in codice JavaScript, ad esempio la prima apre la seconda programmaticamente. Invece se l'utente digita manualmente lo stesso indirizzo in due tabs diverse, vengono considerate due istanze separate con processi distinti. \\
+Per essere precisi, si definisce un "sito" come un dominio registrato (ad esempio \texttt{google.com} o \texttt{bbc.co.uk}) e racchiude anche i suoi sotto-domini (\texttt{mail.google.com}) e le porte (\texttt{google.com:8080}). Un' "istanza di sito" è invece un'insieme di pagine collegate provenienti dallo stesso sito. Due pagine sono considerate connesse se vi sono riferimenti reciproci in codice JavaScript, ad esempio la prima apre la seconda programmaticamente. Invece se l'utente digita manualmente lo stesso indirizzo in due tabs diverse, vengono considerate due istanze separate con processi distinti. \\
 
-Di seguito si illustrano nel dettaglio le diverse strategie multi-process adottati dai browser moderni.
+Di seguito si illustrano nel dettaglio le diverse strategie multi-process impiegate dai browser moderni.
 
 \subsubsection{Process-per-site-instance}
 
@@ -71,7 +71,7 @@ Esiste anche una strategia più semplice che dedica un processo renderer per ogn
 
 Dalla descrizione precedente della strategia \textit{Process-per-site-instance}, sembrerebbe non sia possibile ottenere l'effetto desiderato per il progetto \textit{Stargate}. Si desidera difatti alloccare un processo dedicato ad ogni finestra, sebbene appartengano allo stesso sito e quindi contrariamente al comportamento della strategia \textit{Process-per-site-instance}. \\
 
-In seguito a diverse ricerche è tuttavia emerso che è possibile ottenere un processo dedicato come effetto collaterale di un parametro di sicurezza per la creazione delle nuove finestre. Nei browsers moderni è difatti possibile specificare un parametro \texttt{rel=noopener}, che evita exploits di sicurezza in cui la finestra padre è capace di accedere a riferimenti contenuti nella finestra figlia e/o viceversa. 
+In seguito a diverse ricerche è tuttavia emerso che è possibile ottenere un processo dedicato come effetto collaterale di un parametro di sicurezza per la creazione delle nuove finestre. Nei browsers moderni è difatti possibile specificare un parametro \texttt{rel=noopener}, che evita l'utilizzo di falle di sicurezza per attacchi maligni ove la finestra padre è capace di accedere a riferimenti contenuti nella finestra figlia e/o viceversa. 
 
 Quest'ultimo comportamento di condivisione dei riferimenti è necessario per il corretto funzionamento di molte applicazioni multi-finestra, ma pone gli utenti a rischio qualora le nuove finestre siano di dominio diverso e potenzialmente maligne. Tramite il parametro \texttt{rel=noopener} è invece possibile evitare qualsiasi riferimento tra le parti e per, salvaguardare la sicurezza della memoria, ogni finestra creata con tale parametro ha un proprio processo dedicato. \\
 

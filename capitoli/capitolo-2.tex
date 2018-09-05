@@ -8,7 +8,7 @@
 %**************************************************************
 
 %**************************************************************
-\section{Presentazione del progetto Stargate}
+\section{Presentazione del progetto Stargate}\label{presentazione-progetto}
 
 \begin{figure}[H] 
   \centering 
@@ -18,9 +18,9 @@
 
 Il progetto dello stage consiste nella realizzazione di una libreria \gls{TypeScript} per applicazioni web, che permetta di aprire qualsiasi componente di User Interface (UI) in una nuova pagina mantenendo lo stato sincronizzato con l'applicazione padre. Tale libreria è denominata \textbf{Stargate}, ispirandosi all'omonima serie televisiva di fantascienza incentrata su portali spaziali nelle diverse galassie. \\
 
-Idealmente la libreria dovrebbe funzionare per qualsiasi applicazione web scritta in \gls{JavaScript}, tuttavia il requisito obbligatorio minimale è che si integri con librerie \gls{React} e \gls{Redux} col minor sforzo possibile.\\
+Idealmente la libreria dovrebbe funzionare per qualsiasi applicazione web scritta in \gls{JavaScript}, tuttavia il requisito obbligatorio minimale è che lo stato applicativo si integri alle librerie \gls{React} e \gls{Redux} col minor sforzo possibile. Devono inoltre essere forniti i moduli per adattare le classi, responsabili della comunicazione multi-finestra, ai \gls{design-patterns} caratteristici di quest'ultime due librerie. \\
 
-La prima fase dello stage richiede dunque la realizzazione di un Proof of Concept che verifichi in vitreo la possibilità di spostare un componente UI React dalla finestra \textit{padre} verso una nuova finestra \textit{figlia}, mantenendo lo stato consistente. Tali componenti UI sono identificati col termine \textit{widget}, qualora siano mostrati su una pagina separata. \\
+La prima fase dello stage richiede dunque la realizzazione di un Proof of Concept che verifichi la possibilità di spostare un componente UI React dalla finestra \textit{padre} verso una nuova finestra \textit{figlia}, mantenendo lo stato consistente. Tali componenti UI sono identificati col termine \textit{widget}, qualora siano mostrati su una pagina separata. \\
 
 Un widget deve continuare a visualizzare i dati provenienti dal padre e, se questi si aggiornano, anche il componente nella finestra figlia deve aggiornarsi consistentemente. Viceversa le interazioni utente nel componente devono essere propagate alla pagina principale. In sostanza, il componente deve esibire lo stesso comportamento di quando si trovi nell'applicazione principale, sebbene fisicamente si trovi su una diversa pagina del browser. \\
 
@@ -56,7 +56,7 @@ Si farà riferimento agli obiettivi secondo le seguenti notazioni:
     \item \textbf{F} per i requisiti facoltativi, rappresentanti valore aggiunto non strettamente competitivo.
 \end{itemize}
 
-Le sigle precedentemente indicate saranno seguite da una coppia sequenziale di numeri, identificativo del requisito. Si quindi prevede lo svolgimento dei seguenti obiettivi:
+Le sigle precedentemente indicate saranno seguite da una coppia sequenziale di numeri, identificativo del requisito. Si prevede quindi lo svolgimento dei seguenti obiettivi:
 
 \begin{table}[H]
 \small

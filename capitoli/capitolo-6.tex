@@ -7,9 +7,9 @@
 \label{cap:diff-patch}
 %**************************************************************
 
-Uno degli obiettivi primari del progetto \textit{Stargate} è il supporto prestazionale a grosse mole di dati, dell'ordine di diversi MByte, in continuo aggiornamento ed uso. Finora l'architettura ottimizza il calcolo dello stato derivato attraverso i \textit{Web Workers} e tutte le operazioni dei widgets per via di un processo dedicato del Sistema Operativo. \\
+Uno degli obiettivi primari del progetto \textit{Stargate} è il supporto prestazionale a grosse mole di dati, dell'ordine di diversi MByte, in continuo aggiornamento ed uso. A questo punto del documento, l'architettura ottimizza il calcolo dello stato derivato attraverso i \textit{Web Workers} e tutte le operazioni dei widgets per via di un processo dedicato del Sistema Operativo. \\
 
-Tuttavia entrambe le soluzioni non sono in grado di ottimizzare un potenziale collo-di-bottiglia delle performance: la trasmissione di grosse quantità di dati. Attualmente, ad ogni modifica dello stato applicativo, questi va inviato interamente al \textit{Web Worker} affinché possa calcolare gli stati derivati dei widgets, che a loro volta sono poi inviati ai widgets appunto. \\
+Tuttavia entrambe le soluzioni non sono in grado di ottimizzare un potenziale collo-di-bottiglia delle performances: la trasmissione di grosse quantità di dati. Attualmente, ad ogni modifica dello stato applicativo, questi va inviato interamente al \textit{Web Worker} affinché possa calcolare gli stati derivati dei widgets, e tali stati sono a loro volta sono poi inviati ai widgets appunto. \\
 
 Se da un lato tale scambio di dati non abbia impatti negativi sulla pagina principale grazie all'uso di \textit{Web Worker} e processi dedicati, dall'altro potrebbe causare un ritardo nei tempi di aggiornamento dell'Interfaccia Utente nelle finestre widget. Ciò causerebbe una cattiva percezione dell'utente nei confronti della fluidità d'uso dei componenti aperti nelle nuove finestre.
 
@@ -37,11 +37,13 @@ Si assicura in tal modo che le dimensioni del carico di trasmissione siano dipen
 
 \section{Ottimizzazione per immutable state}
 
-Essendo inoltre \textit{Stargate} rivolto verso applicazioni web moderne, in particolare in React \& Redux, l'algoritmo interno di \textit{diff \& patch} assume anche che modifiche allo oggetto stato applicativo non vengano fate per riferimento, ma bensì ritornino una copia aggiornata avente un nuovo riferimento e le cui proprietà siano anch'esse nuove laddove modificate.
+Essendo inoltre \textit{Stargate} rivolto verso applicazioni web moderne, in particolare in React \& Redux, l'algoritmo interno di \textit{diff \& patch} assume anche che modifiche allo stato applicativo non vengano fatte per riferimento, ma bensì ritornino una copia aggiornata avente un nuovo riferimento e le cui proprietà siano anch'esse nuove laddove modificate. \\
+
+Si parla nello specifico di \textit{strutture dati persistenti}.
 
 \subsection{Strutture dati persistenti}
 
-Una modifica per riferimento è una mutazione diretta ad una struttura dati (un oggetto) esistente senza crearne una copia. Una modifica \textbf{immutable} invece si assicura preventivamente di fare una copia, non profonda, dell'oggetto in qualsiasi caso in cui una proprietà cambi. \\
+Una modifica per riferimento è una mutazione diretta ad una struttura dati esistente (un oggetto) senza crearne una copia. Una modifica \textbf{immutable} invece si assicura preventivamente di fare una copia, non profonda, dell'oggetto in qualsiasi caso in cui una proprietà cambi. \\
 
 Ad esempio si assuma di voler modificare la proprietà \texttt{xs.d.g.f} sostituendo 1 con \texttt{\{ e: 1 \}}. 
 
@@ -95,6 +97,6 @@ Tali strutture dati sono fondamentali nei linguaggi di programmazione funzionali
 
 Nel caso specifico dell'algoritmo \textit{diff \& patch}, le strutture immutabili permettono di ottimizzare il calcolo del \textit{delta} in quanto è sufficiente controllare per riferimento se un campo è cambiato rispetto a prima, senza dover controllare profondamente i valori. Ad esempio confrontando \texttt{xs} e \texttt{ys} dall'esempio precedente, l'algoritmo può evitare di proseguire il calcolo del \textit{delta} per l'intero sotto-albero \texttt{b} in quanto il riferimento non è cambiato. Se invece viene rilevato un diverso riferimento, l'algoritmo continua lavorando sul sotto-albero. \\
 
-Per uno stato applicativo di notevoli dimensioni, questa ottimizzazione permette di migliorare notevolmente i tempi di \textit{diffing} dell'algoritmo, rendendo il costo linearmente dipendente al numero di modifiche invece che di dimensioni della struttura.
+Per uno stato applicativo di notevoli dimensioni, questa ottimizzazione permette di migliorare notevolmente i tempi di \textit{diffing} dell'algoritmo, rendendo il costo linearmente dipendente al numero di modifiche invece che alle dimensioni della struttura.
 
 Un controllo di riferimento per sapere se un sotto-albero è cambiato ha difatti tempo costante \texttt{O(1)}, altrimenti sarebbe direttamente proporzionale \texttt{$\Theta$(n)} al numero di campi annidati.
