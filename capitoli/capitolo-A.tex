@@ -21,7 +21,7 @@ TypeScript è un linguaggio di programmazione open-source sviluppato e mantenuto
 
 Il linguaggio fornisce i tipi statici attraverso \textit{type annotations} che attivano il controllo dei tipi a tempo di compilazione. La scelta è tuttavia opzionale ed è possibile scrivere normale codice JavaScript senza tipi. \\
 
-\begin{lstlisting}[language={[Sharp]C}]
+\begin{lstlisting}[language={[Sharp]C},basicstyle=\footnotesize]
 // Esempio di funzione con tipi statici
 function add(left: number, right: number): number {
   return left + right;
@@ -44,7 +44,7 @@ Sia la libreria \textit{Stargate} che l'applicazione \textit{WorkWave Route Mana
 
 La seguente classe è un componente UI React, che accetta una proprietà \texttt{greeting}. Il metodo \texttt{ReactDOM.render} si occupa invece di creare un'istanza di tale componente, passando ad esso \texttt{"Hello World!"} come valore di \texttt{greeting}. Il risultato è renderizzato come figlio del nodo HTML avente id \texttt{"root"}. \\
 
-\begin{lstlisting}[language={[Sharp]C}]
+\begin{lstlisting}[language={[Sharp]C},basicstyle=\footnotesize]
 class Greeter extends React.Component { 
   render() { 
     return <h1>{this.props.greeting}</h1>
@@ -65,7 +65,7 @@ Di seguito sono invece elencate le caratteristiche principali di React, che hann
 
   \vfill
 
-    \begin{lstlisting}[language={[Sharp]C}]
+    \begin{lstlisting}[language={[Sharp]C},basicstyle=\footnotesize]
 class ParentComponent extends React.Component {
   state = { color: 'red' };
 

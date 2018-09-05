@@ -100,7 +100,7 @@ La finestra che riceve il messaggio può rimanere in ascolto attraverso la propr
 
 \vfill
 
-\begin{lstlisting}[language={[Sharp]C}]
+\begin{lstlisting}[language={[Sharp]C},basicstyle=\footnotesize]
 self.onmessage = function(message) {
     // Do something with message
 }
@@ -116,7 +116,7 @@ Laddove l'API dedicata alla comunicazione cross-page \textit{postMessage} non si
 
 Esempio di invio di dati:
 
-\begin{lstlisting}[language={[Sharp]C}]
+\begin{lstlisting}[language={[Sharp]C},basicstyle=\footnotesize]
 // Salva nel proprio storage, che e' tuttavia condiviso
 // tra tabs dello stesso dominio
 window.localStorage.setItem('stargate-msg', message)
@@ -124,7 +124,7 @@ window.localStorage.setItem('stargate-msg', message)
 
 Esempio di ascolto di dati, ove si rimane in ascolto dell'evento di modifica dello Storage:
 
-\begin{lstlisting}[language={[Sharp]C}]
+\begin{lstlisting}[language={[Sharp]C},basicstyle=\footnotesize]
 window.addEventListener('storage', function(event) {
   const message = window.localStorage.getItem('stargate-msg')
 })

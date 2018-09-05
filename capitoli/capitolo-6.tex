@@ -45,7 +45,7 @@ Una modifica per riferimento è una mutazione diretta ad una struttura dati (un 
 
 Ad esempio si assuma di voler modificare la proprietà \texttt{xs.d.g.f} sostituendo 1 con \texttt{\{ e: 1 \}}. 
 
-\begin{lstlisting}[language={[Sharp]C}]
+\begin{lstlisting}[language={[Sharp]C},basicstyle=\footnotesize]
 const xs = {
   d: {
     b: {
@@ -64,7 +64,7 @@ Modificarlo per riferimento sarebbe eseguire l'istruzione JavaScript \texttt{xs.
 
 Una modifica immutabile invece ritorna un nuovo oggetto \texttt{ys}, ove sia \texttt{ys} che i suoi sotto-oggetti \texttt{d', g', f'} hanno nuovi riferimenti mentre \texttt{b} è rimasto invariato poiché non modificato.
 
-\begin{lstlisting}[language={[Sharp]C}]
+\begin{lstlisting}[language={[Sharp]C},basicstyle=\footnotesize]
 const ys = {        // <== nuovo riferimento ys
   d: {              // <== nuovo riferimento d'
     b: {
